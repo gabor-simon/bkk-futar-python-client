@@ -3,8 +3,10 @@ import logging
 
 
 class BkkFutar:
+    """API specification: https://bkkfutar.docs.apiary.io/"""
+
     HOST = "https://futar.bkk.hu"
-    KEY = "PyFutar"
+    KEY = "apaiary-test"
     API_PATH = "api/query/v1/ws/otp/api/where"
 
     def __init__(self, host=HOST, path=API_PATH, key=KEY, include_references=True):
@@ -12,7 +14,8 @@ class BkkFutar:
         self.uri = f"{host}/{path}"
         self.params = {"includeReferences": "true" if include_references in (True, None) else "false",
                        "key": key,
-                       "version": "3"}
+                       "version": "3",
+                       "appVersion": "pyFutar-1.0"}
         self.headers = {"Content-Type": "application/json"}
         self._logger = logging.getLogger("")
 
@@ -71,9 +74,9 @@ class BkkFutar:
                        "onlyDepartures": "true" if only_departures in (True, None) else "false"})
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def arrivals_and_departures_for_location(self, lon, lat, lon_span=None, lat_span=None, only_departures=False,
-                                             limit=60, minutes_before=2, minutes_after=30,
-                                             group_limit=4, client_lon=None, client_lat=None):
+    def arrivals_and_departures_for_location(self, lon, lat, lon_span="", lat_span="", only_departures=False,
+                                             limit=60, minutes_before=0, minutes_after=30, radius=100,
+                                             group_limit=4, client_lon=None, client_lat=None, include_references=True):
         endpoint = f"{self.uri}/arrivals-and-departures-for-location.json"
         params = self.params
         params.update({"lon": lon,
@@ -81,7 +84,9 @@ class BkkFutar:
                        "lonSpan": lon_span,
                        "latSpan": lat_span,
                        "onlyDepartures": "true" if only_departures in (True, None) else "false",
+                       "includeReferences": "true" if include_references in (True, None) else "false",
                        "limit": limit,
+                       "radius": radius,
                        "minutesBefore": minutes_before,
                        "minutesAfter": minutes_after,
                        "groupLimit": group_limit,
@@ -90,11 +95,12 @@ class BkkFutar:
                        })
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def schedule_for_stop(self, stopid, date, only_departures=False):
+    def schedule_for_stop(self, stopid, date, only_departures=False, include_references=True):
         endpoint = f"{self.uri}/schedule-for-stop.json"
         params = self.params
         params.update({"stopId": stopid,
                        "onlyDepartures": "true" if only_departures in (True, None) else "false",
+                       "includeReferences": "true" if include_references in (True, None) else "false",
                        "date": date
                        })
         return self._call_endpoint(endpoint, self.headers, params)
@@ -108,7 +114,7 @@ class BkkFutar:
                        })
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def trip_details(self, tripid, vehicle_id, date, include_references=True):
+    def trip_details(self, tripid, vehicle_id, date=None, include_references=True):
         endpoint = f"{self.uri}/trip-details.json"
         params = self.params
         params.update({"tripId": tripid,
@@ -148,13 +154,3 @@ class BkkFutar:
                        "includeReferences": "true" if include_references in (True, None) else "false"
                        })
         return self._call_endpoint(endpoint, self.headers, params)
-
-
-def main():
-    api = BkkFutar()
-    print(api.vehicles_for_stop("BKK_F04683"))
-    pass
-
-
-if __name__ == '__main__':
-    main()
