@@ -24,32 +24,30 @@ class BkkFutar:
             response = requests.get(endpoint, headers=headers, params=params)
         except requests.exceptions.RequestException as err:
             self._logger.error(err)
-            return None
-        return response.json()
+            raise ConnectionError
+        else:
+            return response.json()
 
-    def bicycle_rental(self, include_references=True):
+    def bicycle_rental(self):
         endpoint = f"{self.uri}/bicycle-rental.json"
         params = self.params
-        params.update({"includeReferences": "true" if include_references in (True, None) else "false"})
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def alert_search(self, query, start=None, end=None, include_references=True):
+    def alert_search(self, query, start=None, end=None):
         endpoint = f"{self.uri}/alert-search.json"
         params = self.params
         params.update({"query": query,
                        "start": start,
-                       "end": end,
-                       "includeReferences": "true" if include_references in (True, None) else "false"})
+                       "end": end})
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def search(self, query, include_references=True):
+    def search(self, query):
         endpoint = f"{self.uri}/search.json"
         params = self.params
-        params.update({"query": query,
-                       "includeReferences": "true" if include_references in (True, None) else "false"})
+        params.update({"query": query})
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def stops_for_location(self, lon, lat, lon_span=None, lat_span=None, radius=100, query="", include_references=True):
+    def stops_for_location(self, lon, lat, lon_span=None, lat_span=None, radius=100, query=""):
         endpoint = f"{self.uri}/stops-for-location.json"
         params = self.params
         params.update({"lon": lon,
@@ -57,26 +55,23 @@ class BkkFutar:
                        "lonSpan": lon_span,
                        "latSpan": lat_span,
                        "radius": radius,
-                       "query": query,
-                       "includeReferences": "true" if include_references in (True, None) else "false"
-                       })
+                       "query": query})
         return self._call_endpoint(endpoint, self.headers, params)
 
     def arrivals_and_departures_for_stop(self, stopid, only_departures=False, minutes_before=0, minutes_after=30,
-                                         limit=60, include_references=True):
+                                         limit=60):
         endpoint = f"{self.uri}/arrivals-and-departures-for-stop.json"
         params = self.params
         params.update({"stopId": stopid,
                        "minutesBefore": minutes_before,
                        "minutesAfter": minutes_after,
                        "limit": limit,
-                       "includeReferences": "true" if include_references in (True, None) else "false",
                        "onlyDepartures": "true" if only_departures in (True, None) else "false"})
         return self._call_endpoint(endpoint, self.headers, params)
 
     def arrivals_and_departures_for_location(self, lon, lat, lon_span="", lat_span="", only_departures=False,
                                              limit=60, minutes_before=0, minutes_after=30, radius=100,
-                                             group_limit=4, client_lon=None, client_lat=None, include_references=True):
+                                             group_limit=4, client_lon=None, client_lat=None):
         endpoint = f"{self.uri}/arrivals-and-departures-for-location.json"
         params = self.params
         params.update({"lon": lon,
@@ -84,7 +79,6 @@ class BkkFutar:
                        "lonSpan": lon_span,
                        "latSpan": lat_span,
                        "onlyDepartures": "true" if only_departures in (True, None) else "false",
-                       "includeReferences": "true" if include_references in (True, None) else "false",
                        "limit": limit,
                        "radius": radius,
                        "minutesBefore": minutes_before,
@@ -95,37 +89,34 @@ class BkkFutar:
                        })
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def schedule_for_stop(self, stopid, date, only_departures=False, include_references=True):
+    def schedule_for_stop(self, stopid, date, only_departures=False):
         endpoint = f"{self.uri}/schedule-for-stop.json"
         params = self.params
         params.update({"stopId": stopid,
                        "onlyDepartures": "true" if only_departures in (True, None) else "false",
-                       "includeReferences": "true" if include_references in (True, None) else "false",
                        "date": date
                        })
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def route_details(self, routeid, related=False, include_references=True):
+    def route_details(self, routeid, related=False):
         endpoint = f"{self.uri}/route-details.json"
         params = self.params
         params.update({"routeId": routeid,
-                       "includeReferences": "true" if include_references in (True, None) else "false",
                        "related": "true" if related in (True, None) else "false"
                        })
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def trip_details(self, tripid, vehicle_id, date=None, include_references=True):
+    def trip_details(self, tripid, vehicle_id, date=None):
         endpoint = f"{self.uri}/trip-details.json"
         params = self.params
         params.update({"tripId": tripid,
                        "vehicleId": vehicle_id,
-                       "includeReferences": "true" if include_references in (True, None) else "false",
                        "date": date
                        })
         return self._call_endpoint(endpoint, self.headers, params)
 
     def vehicles_for_location(self, lon, lat, radius=100, query="", lon_span=None,
-                              lat_span=None, include_references=True):
+                              lat_span=None):
         endpoint = f"{self.uri}/vehicles-for-location.json"
         params = self.params
         params.update({"lon": lon,
@@ -133,24 +124,18 @@ class BkkFutar:
                        "radius": radius,
                        "query": query,
                        "lonSpan": lon_span,
-                       "latSpan": lat_span,
-                       "includeReferences": "true" if include_references in (True, None) else "false"
-                       })
+                       "latSpan": lat_span})
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def vehicles_for_route(self, route_id, related=False, include_references=True):
+    def vehicles_for_route(self, route_id, related=False):
         endpoint = f"{self.uri}/vehicles-for-route.json"
         params = self.params
         params.update({"routeId": route_id,
-                       "related": "true" if related in (True, None) else "false",
-                       "includeReferences": "true" if include_references in (True, None) else "false"
-                       })
+                       "related": "true" if related in (True, None) else "false"})
         return self._call_endpoint(endpoint, self.headers, params)
 
-    def vehicles_for_stop(self, stopid, include_references=True):
+    def vehicles_for_stop(self, stopid):
         endpoint = f"{self.uri}/vehicles-for-stop.json"
         params = self.params
-        params.update({"stopId": stopid,
-                       "includeReferences": "true" if include_references in (True, None) else "false"
-                       })
+        params.update({"stopId": stopid})
         return self._call_endpoint(endpoint, self.headers, params)

@@ -1,5 +1,6 @@
 import pytest
-from bkk import BkkFutar
+
+from futar import BkkFutar
 
 
 @pytest.fixture
@@ -13,8 +14,8 @@ def not_existing_api():
 
 
 def test_none_response_when_connection_error(not_existing_api: BkkFutar):
-    response = not_existing_api.search(None)
-    assert response is None
+    with pytest.raises(ConnectionError):
+        not_existing_api.search(None)
 
 
 def test_bicycle_rental(api: BkkFutar):
