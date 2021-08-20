@@ -7,6 +7,9 @@ The goal of this simple project to wrap available methods into a class collected
 
 Source code: [Github](https://github.com/gabor-simon/bkk-futar-python-client)
 
+Before using the package, you need to install it trough pip:
+> pip install bkkfutar
+
 Sample usage:
 ````python
 import futar
